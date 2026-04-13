@@ -1,0 +1,4 @@
+localstack_*
+*.log
+__pycache__/
+*.db
