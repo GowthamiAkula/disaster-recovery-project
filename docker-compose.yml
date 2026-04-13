@@ -1,0 +1,46 @@
+services:
+  primary_app:
+    build: ./app
+    container_name: primary_app
+    environment:
+      - DB_PATH=/data/primary/application.db
+    volumes:
+      - ./data/primary:/data/primary
+    ports:
+      - "5001:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  dr_app:
+    build: ./app
+    container_name: dr_app
+    environment:
+      - DB_PATH=/data/dr/application.db
+    volumes:
+      - ./data/dr:/data/dr
+    ports:
+      - "5002:5000"
+    deploy:
+      replicas: 0
+
+  primary_localstack:
+    image: localstack/localstack:latest
+    container_name: primary_localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+
+  dr_localstack:
+    image: localstack/localstack:latest
+    container_name: dr_localstack
+    ports:
+      - "4567:4566"
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      
